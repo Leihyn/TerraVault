@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraVault — Commodity Markets for the World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   CSS VARIABLES
+   ============================================= */
+:root {
+  /* Base */
+  --bg-base: #0a0612;
+  --bg-elevated: #120e1f;
+  --bg-card: #16112a;
+  --bg-overlay: rgba(10, 6, 18, 0.92);
+
+  /* Gradient accents */
+  --amber: #f59e0b;
+  --amber-light: #fbbf24;
+  --rose: #e11d48;
+  --rose-light: #fb7185;
+  --gradient-primary: linear-gradient(135deg, var(--amber) 0%, var(--rose) 100%);
+  --gradient-hero: radial-gradient(ellipse at 50% 40%, #1a0f3a 0%, #0f0820 40%, var(--bg-base) 70%);
+
+  /* Category colors */
+  --cat-precious: #f59e0b;
+  --cat-energy: #3b82f6;
+  --cat-industrial: #f97316;
+  --cat-agriculture: #22c55e;
+
+  /* Text */
+  --text-primary: #f5f0eb;
+  --text-secondary: #a89bb0;
+  --text-muted: #6b5f78;
+  --text-accent: var(--amber);
+
+  /* Surfaces */
+  --border-subtle: rgba(168, 155, 176, 0.1);
+  --border-card: rgba(168, 155, 176, 0.08);
+
+  /* Typography */
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Spacing */
+  --radius-card: 8px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration: 200ms;
+  --duration-slow: 400ms;
+  --duration-hero: 800ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration: 0ms;
+    --duration-slow: 0ms;
+    --duration-hero: 0ms;
+  }
+  .hero-orb,
+  .hero-ring,
+  .hero-particle {
+    animation: none !important;
+  }
+  .scroll-indicator {
+    animation: none !important;
+  }
+}
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Tabular numbers for prices */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =============================================
+   DNA BADGE
+   ============================================= */
+.dna-badge {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(10, 6, 18, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* =============================================
+   TOP BAR
+   ============================================= */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  transition: background var(--duration) var(--ease-out);
+}
+
+.topbar.scrolled {
+  background: rgba(10, 6, 18, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.topbar-logo {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.topbar.scrolled .topbar-logo {
+  opacity: 1;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hamburger */
+.hamburger {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  z-index: 1001;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: transform var(--duration) var(--ease-out), opacity var(--duration) var(--ease-out);
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Wallet button */
+.btn-wallet {
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease-out), background var(--duration) var(--ease-out);
+  white-space: nowrap;
+}
+
+.btn-wallet:hover {
+  border-color: var(--amber);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.btn-wallet.connected {
+  border-color: var(--cat-agriculture);
+  color: var(--cat-agriculture);
+}
+
+/* =============================================
+   FULLSCREEN NAV OVERLAY
+   ============================================= */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.nav-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-overlay a {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 12px 24px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  transition: color var(--duration) var(--ease-out), transform var(--duration) var(--ease-out);
+}
+
+.nav-overlay a:hover {
+  color: var(--text-primary);
+  transform: translateX(8px);
+}
+
+.nav-overlay .nav-footer {
+  position: absolute;
+  bottom: 40px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* =============================================
+   HERO SECTION
+   ============================================= */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+/* Gradient background layers */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-hero);
+}
+
+/* Cosmic orb — the globe metaphor */
+.hero-orb-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, 80vw);
+  height: min(600px, 80vw);
+  pointer-events: none;
+}
+
+.hero-orb {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 35% 30%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 65% 70%, rgba(225, 29, 72, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(26, 15, 58, 0.8) 0%, transparent 70%);
+  animation: orb-breathe 8s ease-in-out infinite;
+}
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+/* Orbital rings */
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 158, 11, 0.08);
+}
+
+.hero-ring:nth-child(1) {
+  inset: -10%;
+  animation: ring-rotate 30s linear infinite;
+}
+.hero-ring:nth-child(2) {
+  inset: -25%;
+  border-color: rgba(225, 29, 72, 0.06);
+  animation: ring-rotate 45s linear infinite reverse;
+}
+.hero-ring:nth-child(3) {
+  inset: -40%;
+  border-color: rgba(245, 158, 11, 0.04);
+  animation: ring-rotate 60s linear infinite;
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floating particles on the rings */
+.hero-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+}
+
+.hero-particle:nth-child(1) {
+  top: 10%;
+  left: 50%;
+  animation: particle-drift-1 12s ease-in-out infinite;
+}
+.hero-particle:nth-child(2) {
+  top: 80%;
+  right: 20%;
+  width: 3px;
+  height: 3px;
+  background: var(--rose);
+  box-shadow: 0 0 8px var(--rose);
+  animation: particle-drift-2 16s ease-in-out infinite;
+}
+.hero-particle:nth-child(3) {
+  top: 30%;
+  left: 15%;
+  width: 2px;
+  height: 2px;
+  animation: particle-drift-3 20s ease-in-out infinite;
+}
+
+@keyframes particle-drift-1 {
+  0%, 100% { transform: translate(0, 0); opacity: 1; }
+  33% { transform: translate(40px, 20px); opacity: 0.5; }
+  66% { transform: translate(-20px, -10px); opacity: 0.8; }
+}
+@keyframes particle-drift-2 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.7; }
+  50% { transform: translate(-30px, -40px); opacity: 1; }
+}
+@keyframes particle-drift-3 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+  50% { transform: translate(20px, 30px); opacity: 1; }
+}
+
+/* Latitude lines on the orb */
+.hero-latitude {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.06) 30%, rgba(245, 158, 11, 0.06) 70%, transparent 100%);
+}
+.hero-latitude:nth-child(1) { top: 30%; }
+.hero-latitude:nth-child(2) { top: 45%; }
+.hero-latitude:nth-child(3) { top: 60%; }
+.hero-latitude:nth-child(4) { top: 75%; }
+
+/* Meridian arcs */
+.hero-meridian {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(225, 29, 72, 0.05) 30%, rgba(225, 29, 72, 0.05) 70%, transparent 100%);
+}
+.hero-meridian:nth-child(1) { left: 35%; transform: rotate(-10deg); }
+.hero-meridian:nth-child(2) { left: 50%; }
+.hero-meridian:nth-child(3) { left: 65%; transform: rotate(10deg); }
+
+/* Hero text content */
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 0 24px;
+  max-width: 800px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-fade-in var(--duration-hero) var(--ease-out) 200ms forwards;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 10vw, 96px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: hero-fade-in var(--duration-hero) var(--ease-out) 400ms forwards;
+}
+
+.hero-subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 560px;
+  margin: 0 auto 40px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-fade-in var(--duration-hero) var(--ease-out) 600ms forwards;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-fade-in var(--duration-hero) var(--ease-out) 800ms forwards;
+}
+
+.hero-stat-value {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hero-stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+@keyframes hero-fade-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: hero-fade-in var(--duration-hero) var(--ease-out) 1200ms forwards;
+}
+
+.scroll-indicator span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--text-muted), transparent);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* =============================================
+   MARKETPLACE SECTION
+   ============================================= */
+.marketplace {
+  position: relative;
+  padding: 80px 24px 120px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  margin-bottom: 48px;
+}
+
+.section-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  max-width: 480px;
+}
+
+/* Category filters */
+.category-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+  white-space: nowrap;
+}
+
+.category-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.category-btn.active {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Commodity Grid */
+.commodity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Commodity Card */
+.commodity-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  cursor: pointer;
+  transition: transform var(--duration) var(--ease-out),
+              border-color var(--duration) var(--ease-out),
+              box-shadow var(--duration) var(--ease-out);
+  overflow: hidden;
+}
+
+.commodity-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--card-accent);
+  opacity: 0.7;
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+.commodity-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 155, 176, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.commodity-card:hover::before {
+  opacity: 1;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.card-change {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.card-change.up {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.card-change.down {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.card-name {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.card-category {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.card-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.card-price {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.card-unit {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.card-buy {
+  height: 44px;
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.card-buy:hover {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* =============================================
+   SKELETON LOADING
+   ============================================= */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 24px;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-bar {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.skeleton .skel-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-card);
+}
+
+.skeleton .skel-title {
+  height: 20px;
+  width: 60%;
+  margin: 20px 0 8px;
+}
+
+.skeleton .skel-sub {
+  height: 14px;
+  width: 40%;
+  margin-bottom: 24px;
+}
+
+.skeleton .skel-price {
+  height: 28px;
+  width: 50%;
+  margin-bottom: 20px;
+}
+
+.skeleton .skel-btn {
+  height: 44px;
+  width: 100%;
+  border-radius: var(--radius-pill);
+}
+
+/* =============================================
+   TRADE OVERLAY
+   ============================================= */
+.trade-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 6, 18, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.trade-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.trade-panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 1px solid var(--border-subtle);
+  border-bottom: none;
+  padding: 24px 24px 40px;
+  transform: translateY(100%);
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.trade-overlay.open .trade-panel {
+  transform: translateY(0);
+}
+
+.trade-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-muted);
+  margin: 0 auto 24px;
+  opacity: 0.4;
+}
+
+.trade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.trade-commodity-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.trade-commodity-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.trade-commodity-name {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.trade-commodity-price {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.trade-close {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration) var(--ease-out);
+}
+
+.trade-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Trade type toggle */
+.trade-type-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: 28px;
+  border: 1px solid var(--border-subtle);
+}
+
+.trade-type-btn {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.trade-type-btn.active {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--amber);
+}
+
+/* Amount input */
+.trade-amount-group {
+  margin-bottom: 28px;
+}
+
+.trade-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.trade-amount-input-wrap {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 0 16px;
+  transition: border-color var(--duration) var(--ease-out);
+}
+
+.trade-amount-input-wrap:focus-within {
+  border-color: var(--amber);
+}
+
+.trade-currency-prefix {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+
+.trade-amount-input {
+  flex: 1;
+  height: 56px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-amount-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.trade-amount-unit {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Quick amount buttons */
+.trade-quick-amounts {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.quick-amt {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.quick-amt:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Fee breakdown */
+.trade-fees {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 20px;
+  margin-bottom: 28px;
+}
+
+.trade-fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.trade-fee-label {
+  color: var(--text-secondary);
+}
+
+.trade-fee-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-fee-row.total {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 8px;
+  padding-top: 16px;
+  font-size: 16px;
+}
+
+.trade-fee-row.total .trade-fee-label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Confirm button */
+.trade-confirm {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out);
+}
+
+.trade-confirm:hover {
+  opacity: 0.9;
+  transform: scale(1.01);
+}
+
+.trade-confirm:active {
+  transform: scale(0.99);
+}
+
+.trade-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* On-chain note */
+.trade-chain-note {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.chain-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cat-agriculture);
+  box-shadow: 0 0 6px var(--cat-agriculture);
+}
+
+/* =============================================
+   TRADE CONFIRMATION STATE
+   ============================================= */
+.trade-confirmation {
+  display: none;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.trade-confirmation.show {
+  display: block;
+}
+
+.confirm-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid var(--cat-agriculture);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+  color: var(--cat-agriculture);
+}
+
+.confirm-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.confirm-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.confirm-tx {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  font-size: 13px;
+  font-family: monospace;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.confirm-attestation {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.confirm-done-btn {
+  height: 48px;
+  padding: 0 32px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease-out);
+}
+
+.confirm-done-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* =============================================
+   PORTFOLIO SECTION
+   ============================================= */
+.portfolio {
+  padding: 80px 24px 120px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.portfolio-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 24px;
+}
+
+.portfolio-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.portfolio-stat-value {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-stat-change {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 4px;
+  color: #22c55e;
+}
+
+/* Holdings table */
+.holdings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.holdings-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.holdings-table th:last-child,
+.holdings-table td:last-child {
+  text-align: right;
+}
+
+.holdings-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-card);
+  font-size: 14px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.holdings-table .holding-name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+.holdings-table .holding-secondary {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.empty-state-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--text-muted);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.empty-state-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-state-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 360px;
+  margin: 0 auto 24px;
+}
+
+.empty-state-btn {
+  height: 48px;
+  padding: 0 28px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+.empty-state-btn:hover {
+  opacity: 0.9;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--duration) var(--ease-out);
+}
+
+.footer-links a:hover {
+  color: var(--text-primary);
+}
+
+.footer-chain {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 640px) {
+  .commodity-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .commodity-card {
+    padding: 16px;
+  }
+
+  .card-price {
+    font-size: 20px;
+  }
+
+  .card-name {
+    font-size: 16px;
+  }
+
+  .card-change {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .hero-stats {
+    gap: 32px;
+  }
+
+  .trade-panel {
+    padding: 20px 20px 32px;
+  }
+
+  .portfolio-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .holdings-table .hide-mobile {
+    display: none;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dna-badge {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .commodity-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================
+   ARC DECORATIONS
+   ============================================= */
+.arc-decoration {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.06;
+}
+
+.arc-decoration svg {
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+
+<!-- DNA Badge -->
+<div class="dna-badge">DNA-G-H-I-G-E</div>
+
+<!-- Top Bar -->
+<header class="topbar" id="topbar">
+  <span class="topbar-logo">TerraVault</span>
+  <div class="topbar-actions">
+    <button class="btn-wallet" id="walletBtn" aria-label="Connect wallet">Connect Wallet</button>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Navigation Overlay -->
+<nav class="nav-overlay" id="navOverlay" aria-hidden="true">
+  <a href="#marketplace" data-nav>Marketplace</a>
+  <a href="#portfolio" data-nav>Portfolio</a>
+  <a href="#" data-nav>Governance</a>
+  <a href="#" data-nav>Docs</a>
+  <a href="#" data-nav>About</a>
+  <div class="nav-footer">Secured on BNB Chain</div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Globe / Earth visual -->
+  <div class="hero-orb-container">
+    <div class="hero-orb">
+      <div class="hero-latitude"></div>
+      <div class="hero-latitude"></div>
+      <div class="hero-latitude"></div>
+      <div class="hero-latitude"></div>
+      <div class="hero-meridian"></div>
+      <div class="hero-meridian"></div>
+      <div class="hero-meridian"></div>
+    </div>
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-particle"></div>
+    <div class="hero-particle"></div>
+    <div class="hero-particle"></div>
+  </div>
+
+  <!-- Hero Content -->
+  <div class="hero-content">
+    <div class="hero-eyebrow">On-Chain Commodities on BNB Chain</div>
+    <h1 class="hero-title">TerraVault</h1>
+    <p class="hero-subtitle">Commodity markets for the world. Not just Wall Street.</p>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-value tabular">$2.4B</div>
+        <div class="hero-stat-label">Total Volume</div>
+      </div>
+      <div>
+        <div class="hero-stat-value tabular">8</div>
+        <div class="hero-stat-label">Commodities</div>
+      </div>
+      <div>
+        <div class="hero-stat-value tabular">142</div>
+        <div class="hero-stat-label">Countries</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="scroll-indicator">
+    <span>Explore Markets</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Marketplace Section -->
+<section class="marketplace" id="marketplace">
+  <div class="section-header">
+    <div class="section-eyebrow">Live Markets</div>
+    <h2 class="section-title">Trade global commodities</h2>
+    <p class="section-subtitle">Tokenized real-world assets settled on-chain. No minimums, no accreditation, no gatekeepers.</p>
+  </div>
+
+  <!-- Category Filters -->
+  <div class="category-filters">
+    <button class="category-btn active" data-filter="all">All</button>
+    <button class="category-btn" data-filter="precious">Precious Metals</button>
+    <button class="category-btn" data-filter="energy">Energy</button>
+    <button class="category-btn" data-filter="industrial">Industrial</button>
+    <button class="category-btn" data-filter="agriculture">Agriculture</button>
+  </div>
+
+  <!-- Commodity Grid (skeleton state initially) -->
+  <div class="commodity-grid" id="commodityGrid">
+    <!-- Filled by JS -->
+  </div>
+</section>
+
+<!-- Portfolio Section -->
+<section class="portfolio" id="portfolio">
+  <div class="section-header">
+    <div class="section-eyebrow">Your Portfolio</div>
+    <h2 class="section-title">Holdings</h2>
+  </div>
+
+  <div id="portfolioContent">
+    <!-- Empty state by default, filled by JS -->
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-logo">TerraVault</div>
+  <div class="footer-links">
+    <a href="#">Docs</a>
+    <a href="#">Governance</a>
+    <a href="#">Audit</a>
+    <a href="#">GitHub</a>
+  </div>
+  <div class="footer-chain">
+    <span class="chain-dot"></span>
+    BNB Chain Mainnet
+  </div>
+</footer>
+
+<!-- Trade Overlay -->
+<div class="trade-overlay" id="tradeOverlay">
+  <div class="trade-panel">
+    <div class="trade-handle"></div>
+
+    <!-- Trade form -->
+    <div id="tradeForm">
+      <div class="trade-header">
+        <div class="trade-commodity-info">
+          <div class="trade-commodity-icon" id="tradeIcon" style="background: rgba(255,255,255,0.04);"></div>
+          <div>
+            <div class="trade-commodity-name" id="tradeName">Gold</div>
+            <div class="trade-commodity-price" id="tradePrice">$4,570.00 / oz</div>
+          </div>
+        </div>
+        <button class="trade-close" id="tradeCloseBtn" aria-label="Close trade panel">&times;</button>
+      </div>
+
+      <div class="trade-type-toggle">
+        <button class="trade-type-btn active" data-type="buy">Buy</button>
+        <button class="trade-type-btn" data-type="sell">Sell</button>
+      </div>
+
+      <div class="trade-amount-group">
+        <div class="trade-label">Amount</div>
+        <div class="trade-amount-input-wrap">
+          <span class="trade-currency-prefix">$</span>
+          <input type="number" class="trade-amount-input" id="tradeAmountInput" placeholder="0.00" min="0" step="0.01">
+          <span class="trade-amount-unit" id="tradeUnit">USD</span>
+        </div>
+        <div class="trade-quick-amounts">
+          <button class="quick-amt" data-amount="100">$100</button>
+          <button class="quick-amt" data-amount="500">$500</button>
+          <button class="quick-amt" data-amount="1000">$1,000</button>
+          <button class="quick-amt" data-amount="5000">$5,000</button>
+        </div>
+      </div>
+
+      <div class="trade-fees" id="tradeFees">
+        <div class="trade-fee-row">
+          <span class="trade-fee-label">Quantity</span>
+          <span class="trade-fee-value tabular" id="feeQty">--</span>
+        </div>
+        <div class="trade-fee-row">
+          <span class="trade-fee-label">Network fee</span>
+          <span class="trade-fee-value tabular">$0.12</span>
+        </div>
+        <div class="trade-fee-row">
+          <span class="trade-fee-label">Protocol fee (0.1%)</span>
+          <span class="trade-fee-value tabular" id="feeProtocol">--</span>
+        </div>
+        <div class="trade-fee-row total">
+          <span class="trade-fee-label">Total</span>
+          <span class="trade-fee-value tabular" id="feeTotal">--</span>
+        </div>
+      </div>
+
+      <button class="trade-confirm" id="tradeConfirmBtn" disabled>Enter an amount</button>
+      <div class="trade-chain-note">
+        <span class="chain-dot"></span>
+        Settled on BNB Chain with on-chain attestation
+      </div>
+    </div>
+
+    <!-- Confirmation state -->
+    <div class="trade-confirmation" id="tradeConfirmation">
+      <div class="confirm-check">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="confirm-title">Trade Confirmed</div>
+      <div class="confirm-subtitle" id="confirmSubtitle">You purchased 0.021 oz of Gold</div>
+      <div class="confirm-tx" id="confirmTx">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span id="confirmTxHash">0x7a3f...e91b</span>
+      </div>
+      <div class="confirm-attestation">On-chain attestation recorded on BNB Chain.<br>Block #41,892,017 -- 2 confirmations</div>
+      <button class="confirm-done-btn" id="confirmDoneBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // =========================================
+  // DATA
+  // =========================================
+  const commodities = [
+    { id: 'xau', name: 'Gold', symbol: 'XAU', price: 4570, unit: 'oz', category: 'precious', change: +1.8 },
+    { id: 'xag', name: 'Silver', symbol: 'XAG', price: 31, unit: 'oz', category: 'precious', change: +0.6 },
+    { id: 'xpt', name: 'Platinum', symbol: 'XPT', price: 1932, unit: 'oz', category: 'precious', change: -0.4 },
+    { id: 'xcu', name: 'Copper', symbol: 'XCU', price: 4.50, unit: 'lb', category: 'industrial', change: +2.1 },
+    { id: 'wti', name: 'Crude Oil WTI', symbol: 'WTI', price: 99, unit: 'bbl', category: 'energy', change: -1.2 },
+    { id: 'brt', name: 'Brent Crude', symbol: 'BRT', price: 106, unit: 'bbl', category: 'energy', change: -0.9 },
+    { id: 'ng',  name: 'Natural Gas', symbol: 'NG', price: 3.50, unit: 'MMBtu', category: 'energy', change: +3.4 },
+    { id: 'wht', name: 'Wheat', symbol: 'WHT', price: 5.80, unit: 'bu', category: 'agriculture', change: -0.3 },
+  ];
+
+  const categoryColors = {
+    precious: 'var(--cat-precious)',
+    energy: 'var(--cat-energy)',
+    industrial: 'var(--cat-industrial)',
+    agriculture: 'var(--cat-agriculture)',
+  };
+
+  const portfolio = [];
+
+  // =========================================
+  // HELPERS
+  // =========================================
+  function formatPrice(price) {
+    if (price >= 100) return price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if (price >= 1) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function formatUSD(val) {
+    return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function randomTxHash() {
+    const hex = '0123456789abcdef';
+    let h = '0x';
+    for (let i = 0; i < 8; i++) h += hex[Math.floor(Math.random() * 16)];
+    h += '...';
+    for (let i = 0; i < 4; i++) h += hex[Math.floor(Math.random() * 16)];
+    return h;
+  }
+
+  // =========================================
+  // SKELETON LOADING
+  // =========================================
+  const grid = document.getElementById('commodityGrid');
+
+  function renderSkeletons() {
+    let html = '';
+    for (let i = 0; i < 8; i++) {
+      html += `
+        <div class="skeleton">
+          <div class="skeleton-bar skel-icon"></div>
+          <div class="skeleton-bar skel-title"></div>
+          <div class="skeleton-bar skel-sub"></div>
+          <div class="skeleton-bar skel-price"></div>
+          <div class="skeleton-bar skel-btn"></div>
+        </div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  function renderCards(filter) {
+    const filtered = filter === 'all' ? commodities : commodities.filter(c => c.category === filter);
+    let html = '';
+    filtered.forEach(c => {
+      const color = categoryColors[c.category];
+      const changeClass = c.change >= 0 ? 'up' : 'down';
+      const changeStr = (c.change >= 0 ? '+' : '') + c.change.toFixed(1) + '%';
+      html += `
+        <div class="commodity-card" style="--card-accent: ${color}" data-id="${c.id}">
+          <div class="card-top">
+            <div class="card-symbol" style="border: 1px solid ${color}33; color: ${color}">${c.symbol}</div>
+            <span class="card-change ${changeClass} tabular">${changeStr}</span>
+          </div>
+          <div class="card-name">${c.name}</div>
+          <div class="card-category">${c.category.charAt(0).toUpperCase() + c.category.slice(1)}</div>
+          <div class="card-price-row">
+            <span class="card-price tabular">$${formatPrice(c.price)}</span>
+            <span class="card-unit">/ ${c.unit}</span>
+          </div>
+          <button class="card-buy" data-id="${c.id}">Trade ${c.symbol}</button>
+        </div>`;
+    });
+
+    if (filtered.length === 0) {
+      html = `
+        <div style="grid-column: 1 / -1;">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="empty-state-title">No commodities in this category</div>
+            <div class="empty-state-text">Try selecting a different category or browse all markets.</div>
+          </div>
+        </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  // Show skeletons, then load cards
+  renderSkeletons();
+  setTimeout(function() {
+    renderCards('all');
+  }, 1200);
+
+  // =========================================
+  // NAV
+  // =========================================
+  const hamburger = document.getElementById('hamburgerBtn');
+  const navOverlay = document.getElementById('navOverlay');
+
+  hamburger.addEventListener('click', function() {
+    const isOpen = navOverlay.classList.contains('open');
+    if (isOpen) {
+      navOverlay.classList.remove('open');
+      hamburger.classList.remove('active');
+      hamburger.setAttribute('aria-expanded', 'false');
+      navOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    } else {
+      navOverlay.classList.add('open');
+      hamburger.classList.add('active');
+      hamburger.setAttribute('aria-expanded', 'true');
+      navOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+
+  // Close nav on link click
+  navOverlay.querySelectorAll('[data-nav]').forEach(function(link) {
+    link.addEventListener('click', function() {
+      navOverlay.classList.remove('open');
+      hamburger.classList.remove('active');
+      hamburger.setAttribute('aria-expanded', 'false');
+      navOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // =========================================
+  // TOPBAR SCROLL
+  // =========================================
+  const topbar = document.getElementById('topbar');
+  let ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        topbar.classList.toggle('scrolled', window.scrollY > 100);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  // =========================================
+  // WALLET CONNECT (stub)
+  // =========================================
+  const walletBtn = document.getElementById('walletBtn');
+  let walletConnected = false;
+
+  walletBtn.addEventListener('click', function() {
+    if (walletConnected) {
+      walletConnected = false;
+      walletBtn.textContent = 'Connect Wallet';
+      walletBtn.classList.remove('connected');
+      portfolio.length = 0;
+      renderPortfolio();
+    } else {
+      walletConnected = true;
+      walletBtn.textContent = '0x7a3f...e91b';
+      walletBtn.classList.add('connected');
+    }
+  });
+
+  // =========================================
+  // CATEGORY FILTERS
+  // =========================================
+  document.querySelector('.category-filters').addEventListener('click', function(e) {
+    const btn = e.target.closest('.category-btn');
+    if (!btn) return;
+    document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderCards(btn.dataset.filter);
+  });
+
+  // =========================================
+  // TRADE OVERLAY
+  // =========================================
+  const tradeOverlay = document.getElementById('tradeOverlay');
+  const tradeForm = document.getElementById('tradeForm');
+  const tradeConfirmation = document.getElementById('tradeConfirmation');
+  const tradeAmountInput = document.getElementById('tradeAmountInput');
+  const tradeConfirmBtn = document.getElementById('tradeConfirmBtn');
+  let activeCommodity = null;
+
+  function openTrade(commodityId) {
+    activeCommodity = commodities.find(function(c) { return c.id === commodityId; });
+    if (!activeCommodity) return;
+
+    const color = categoryColors[activeCommodity.category];
+    document.getElementById('tradeIcon').textContent = activeCommodity.symbol;
+    document.getElementById('tradeIcon').style.borderColor = color + '33';
+    document.getElementById('tradeIcon').style.color = color;
+    document.getElementById('tradeName').textContent = activeCommodity.name;
+    document.getElementById('tradePrice').textContent = '$' + formatPrice(activeCommodity.price) + ' / ' + activeCommodity.unit;
+
+    tradeAmountInput.value = '';
+    updateFees();
+    tradeForm.style.display = '';
+    tradeConfirmation.classList.remove('show');
+
+    tradeOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(function() { tradeAmountInput.focus(); }, 400);
+  }
+
+  function closeTrade() {
+    tradeOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+    activeCommodity = null;
+  }
+
+  // Delegate card clicks
+  grid.addEventListener('click', function(e) {
+    const btn = e.target.closest('.card-buy');
+    const card = e.target.closest('.commodity-card');
+    if (btn) {
+      openTrade(btn.dataset.id);
+    } else if (card) {
+      openTrade(card.dataset.id);
+    }
+  });
+
+  document.getElementById('tradeCloseBtn').addEventListener('click', closeTrade);
+
+  // Close on overlay background click
+  tradeOverlay.addEventListener('click', function(e) {
+    if (e.target === tradeOverlay) closeTrade();
+  });
+
+  // Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (tradeOverlay.classList.contains('open')) closeTrade();
+      if (navOverlay.classList.contains('open')) {
+        navOverlay.classList.remove('open');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+        navOverlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+    }
+  });
+
+  // Buy/Sell toggle
+  document.querySelector('.trade-type-toggle').addEventListener('click', function(e) {
+    const btn = e.target.closest('.trade-type-btn');
+    if (!btn) return;
+    document.querySelectorAll('.trade-type-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    updateFees();
+  });
+
+  // Quick amounts
+  document.querySelector('.trade-quick-amounts').addEventListener('click', function(e) {
+    const btn = e.target.closest('.quick-amt');
+    if (!btn) return;
+    tradeAmountInput.value = btn.dataset.amount;
+    updateFees();
+  });
+
+  // Amount input
+  tradeAmountInput.addEventListener('input', updateFees);
+
+  function updateFees() {
+    const val = parseFloat(tradeAmountInput.value) || 0;
+    if (!activeCommodity || val <= 0) {
+      document.getElementById('feeQty').textContent = '--';
+      document.getElementById('feeProtocol').textContent = '--';
+      document.getElementById('feeTotal').textContent = '--';
+      tradeConfirmBtn.disabled = true;
+      tradeConfirmBtn.textContent = 'Enter an amount';
+      return;
+    }
+
+    const qty = val / activeCommodity.price;
+    const protocolFee = val * 0.001;
+    const networkFee = 0.12;
+    const total = val + protocolFee + networkFee;
+
+    document.getElementById('feeQty').textContent = qty.toFixed(qty < 0.01 ? 6 : 4) + ' ' + activeCommodity.unit;
+    document.getElementById('feeProtocol').textContent = formatUSD(protocolFee);
+    document.getElementById('feeTotal').textContent = formatUSD(total);
+
+    tradeConfirmBtn.disabled = false;
+    const isBuy = document.querySelector('.trade-type-btn.active').dataset.type === 'buy';
+    tradeConfirmBtn.textContent = (isBuy ? 'Buy' : 'Sell') + ' ' + activeCommodity.name;
+  }
+
+  // Confirm trade
+  tradeConfirmBtn.addEventListener('click', function() {
+    if (!activeCommodity || tradeConfirmBtn.disabled) return;
+
+    const val = parseFloat(tradeAmountInput.value) || 0;
+    const qty = val / activeCommodity.price;
+
+    // Add to portfolio
+    const existing = portfolio.find(function(p) { return p.id === activeCommodity.id; });
+    if (existing) {
+      existing.qty += qty;
+      existing.costBasis += val;
+    } else {
+      portfolio.push({
+        id: activeCommodity.id,
+        name: activeCommodity.name,
+        symbol: activeCommodity.symbol,
+        category: activeCommodity.category,
+        qty: qty,
+        costBasis: val,
+        unit: activeCommodity.unit,
+        price: activeCommodity.price,
+      });
+    }
+
+    // Show confirmation
+    document.getElementById('confirmSubtitle').textContent =
+      'You purchased ' + qty.toFixed(qty < 0.01 ? 6 : 4) + ' ' + activeCommodity.unit + ' of ' + activeCommodity.name;
+    document.getElementById('confirmTxHash').textContent = randomTxHash();
+
+    tradeForm.style.display = 'none';
+    tradeConfirmation.classList.add('show');
+
+    renderPortfolio();
+  });
+
+  // Done button
+  document.getElementById('confirmDoneBtn').addEventListener('click', closeTrade);
+
+  // =========================================
+  // PORTFOLIO
+  // =========================================
+  function renderPortfolio() {
+    const container = document.getElementById('portfolioContent');
+
+    if (portfolio.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div class="empty-state-title">No holdings yet</div>
+          <div class="empty-state-text">Your on-chain commodity positions will appear here once you make your first trade.</div>
+          <button class="empty-state-btn" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})">Browse Markets</button>
+        </div>`;
+      return;
+    }
+
+    let totalValue = 0;
+    let totalCost = 0;
+    portfolio.forEach(function(p) {
+      totalValue += p.qty * p.price;
+      totalCost += p.costBasis;
+    });
+    const totalPnl = totalValue - totalCost;
+    const pnlPct = totalCost > 0 ? ((totalPnl / totalCost) * 100).toFixed(1) : '0.0';
+
+    let html = `
+      <div class="portfolio-summary">
+        <div class="portfolio-stat-card">
+          <div class="portfolio-stat-label">Total Value</div>
+          <div class="portfolio-stat-value tabular">${formatUSD(totalValue)}</div>
+        </div>
+        <div class="portfolio-stat-card">
+          <div class="portfolio-stat-label">Total Cost</div>
+          <div class="portfolio-stat-value tabular">${formatUSD(totalCost)}</div>
+        </div>
+        <div class="portfolio-stat-card">
+          <div class="portfolio-stat-label">Positions</div>
+          <div class="portfolio-stat-value">${portfolio.length}</div>
+        </div>
+      </div>
+
+      <table class="holdings-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th class="hide-mobile">Quantity</th>
+            <th class="hide-mobile">Avg Cost</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+    portfolio.forEach(function(p) {
+      const val = p.qty * p.price;
+      const avgCost = p.costBasis / p.qty;
+      html += `
+          <tr>
+            <td>
+              <div class="holding-name">${p.name}</div>
+              <div class="holding-secondary">${p.symbol}</div>
+            </td>
+            <td class="hide-mobile tabular">${p.qty.toFixed(p.qty < 0.01 ? 6 : 4)} ${p.unit}</td>
+            <td class="hide-mobile tabular">${formatUSD(avgCost)}</td>
+            <td class="tabular">${formatUSD(val)}</td>
+          </tr>`;
+    });
+
+    html += `
+        </tbody>
+      </table>`;
+
+    container.innerHTML = html;
+  }
+
+  renderPortfolio();
+
+  // =========================================
+  // SCROLL-BASED HERO PARALLAX
+  // =========================================
+  const heroContent = document.querySelector('.hero-content');
+  const heroOrb = document.querySelector('.hero-orb-container');
+  let rafId;
+
+  function onScroll() {
+    const scrollY = window.scrollY;
+    const vh = window.innerHeight;
+    if (scrollY < vh) {
+      const progress = scrollY / vh;
+      heroContent.style.opacity = 1 - progress * 1.5;
+      heroContent.style.transform = 'translateY(' + (scrollY * 0.3) + 'px)';
+      heroOrb.style.transform = 'translate(-50%, -50%) scale(' + (1 - progress * 0.2) + ')';
+      heroOrb.style.opacity = 1 - progress * 1.2;
+    }
+  }
+
+  window.addEventListener('scroll', function() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(onScroll);
+  });
+})();
+</script>
+</body>
+</html>

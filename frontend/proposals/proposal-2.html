@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraVault — Meridian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0c1222;
+    --navy-light: #131b2e;
+    --navy-mid: #1a2540;
+    --navy-surface: #1e2d4a;
+    --amber: #f59e0b;
+    --amber-hover: #d97706;
+    --amber-dim: rgba(245, 158, 11, 0.15);
+    --amber-glow: rgba(245, 158, 11, 0.08);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: rgba(148, 163, 184, 0.08);
+    --border-active: rgba(245, 158, 11, 0.3);
+    --positive: #22c55e;
+    --negative: #ef4444;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --nav-width: 72px;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--navy);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── DNA Badge ── */
+  .dna-badge {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    background: var(--navy-light);
+    border: 1px solid var(--border-active);
+    padding: 6px 12px;
+    border-radius: 0;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ── Side Navigation ── */
+  .side-nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--nav-width);
+    background: var(--navy-light);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-logo svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .nav-item {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.3s var(--ease);
+    position: relative;
+    background: none;
+    border: none;
+  }
+
+  .nav-item:hover {
+    color: var(--text-secondary);
+    background: var(--amber-glow);
+  }
+
+  .nav-item.active {
+    color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: var(--amber);
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 0;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  /* ── Main Layout ── */
+  .main-content {
+    margin-left: var(--nav-width);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Screens ── */
+  .screen {
+    display: none;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  /* ── Market Screen (Split) ── */
+  .market-screen {
+    flex-direction: row;
+  }
+
+  .hero-left {
+    width: 42%;
+    padding: 80px 64px 64px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .hero-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 32px;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title .accent {
+    color: var(--amber);
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+  }
+
+  .hero-stat-value {
+    font-family: var(--font-body);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-divider {
+    position: absolute;
+    right: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--border-active), transparent);
+  }
+
+  /* ── Right Panel (Commodity List) ── */
+  .market-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .market-header {
+    padding: 32px 48px 0;
+    flex-shrink: 0;
+  }
+
+  .market-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .market-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 0;
+    min-width: 220px;
+    transition: border-color 0.3s var(--ease);
+  }
+
+  .search-box:focus-within {
+    border-color: var(--border-active);
+  }
+
+  .search-box svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-primary);
+    width: 100%;
+  }
+
+  .search-box input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* ── Category Pills ── */
+  .category-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    white-space: nowrap;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .pill:hover {
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+  }
+
+  .pill.active {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  /* ── Commodity List ── */
+  .commodity-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 48px 48px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--navy-mid) transparent;
+  }
+
+  .commodity-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .commodity-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .commodity-list::-webkit-scrollbar-thumb {
+    background: var(--navy-mid);
+    border-radius: 2px;
+  }
+
+  .commodity-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 32px;
+    padding: 20px 24px;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+  }
+
+  .commodity-card:hover {
+    border-color: var(--border-active);
+    background: var(--navy-mid);
+    transform: translateX(4px);
+  }
+
+  .commodity-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .commodity-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--amber-dim);
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+
+  .commodity-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .commodity-symbol {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .commodity-sparkline {
+    width: 80px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .commodity-sparkline svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .commodity-price-col {
+    text-align: right;
+    min-width: 100px;
+  }
+
+  .commodity-price {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--amber);
+  }
+
+  .commodity-change {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+
+  .commodity-change.positive { color: var(--positive); }
+  .commodity-change.negative { color: var(--negative); }
+
+  .buy-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 24px;
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    white-space: nowrap;
+    min-height: 44px;
+  }
+
+  .buy-btn:hover {
+    background: var(--amber-hover);
+    transform: scale(1.02);
+  }
+
+  /* ── Trade Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 18, 34, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease);
+  }
+
+  .modal-overlay.visible {
+    display: flex;
+    opacity: 1;
+  }
+
+  .trade-modal {
+    width: 100%;
+    max-width: 520px;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.5s var(--ease);
+  }
+
+  .modal-overlay.visible .trade-modal {
+    transform: translateY(0);
+  }
+
+  .trade-modal-header {
+    padding: 32px 32px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .trade-modal-commodity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .trade-modal-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--amber);
+  }
+
+  .trade-modal-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .trade-modal-symbol {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  .close-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    border-radius: 0;
+  }
+
+  .close-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  .close-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .trade-modal-price-row {
+    padding: 24px 32px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .trade-modal-price {
+    font-family: var(--font-body);
+    font-size: 36px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--amber);
+  }
+
+  .trade-modal-unit {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .trade-modal-change {
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trade-modal-body {
+    padding: 0 32px 32px;
+  }
+
+  .trade-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .trade-tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    position: relative;
+    min-height: 44px;
+  }
+
+  .trade-tab.active {
+    color: var(--amber);
+  }
+
+  .trade-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--amber);
+  }
+
+  .trade-input-group {
+    margin-bottom: 20px;
+  }
+
+  .trade-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .trade-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    padding: 0 16px;
+    transition: border-color 0.3s var(--ease);
+  }
+
+  .trade-input-wrapper:focus-within {
+    border-color: var(--border-active);
+  }
+
+  .trade-input-prefix {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+
+  .trade-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    padding: 14px 0;
+    min-height: 44px;
+  }
+
+  .trade-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .trade-input-suffix {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .quick-amount {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    min-height: 32px;
+  }
+
+  .quick-amount:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+
+  .trade-summary {
+    background: var(--navy);
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .trade-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  .trade-summary-row:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .trade-summary-label {
+    color: var(--text-muted);
+  }
+
+  .trade-summary-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trade-summary-row.total .trade-summary-label,
+  .trade-summary-row.total .trade-summary-value {
+    font-size: 15px;
+    color: var(--amber);
+    font-weight: 700;
+  }
+
+  .confirm-btn {
+    width: 100%;
+    padding: 16px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    min-height: 52px;
+    letter-spacing: 0.3px;
+  }
+
+  .confirm-btn:hover {
+    background: var(--amber-hover);
+    transform: scale(1.01);
+  }
+
+  .confirm-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── Success State ── */
+  .trade-success {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 48px 32px;
+  }
+
+  .trade-success.visible {
+    display: flex;
+  }
+
+  .success-check {
+    width: 64px;
+    height: 64px;
+    background: var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .success-check svg {
+    width: 32px;
+    height: 32px;
+    color: var(--amber);
+  }
+
+  .success-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .success-detail {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .success-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .success-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    min-height: 44px;
+  }
+
+  .success-btn.primary {
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+  }
+
+  .success-btn.primary:hover {
+    background: var(--amber-hover);
+  }
+
+  .success-btn.secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .success-btn.secondary:hover {
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+  }
+
+  /* ── Portfolio Screen ── */
+  .portfolio-screen {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .portfolio-header {
+    padding: 48px 64px 0;
+    flex-shrink: 0;
+  }
+
+  .portfolio-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .portfolio-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 40px;
+  }
+
+  .portfolio-overview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .portfolio-stat {
+    background: var(--navy-light);
+    padding: 28px 32px;
+  }
+
+  .portfolio-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .portfolio-stat-value {
+    font-family: var(--font-body);
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .portfolio-stat-value.amber { color: var(--amber); }
+
+  .portfolio-stat-change {
+    font-size: 13px;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .portfolio-holdings {
+    padding: 0 64px 64px;
+  }
+
+  .portfolio-section-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .holdings-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .holdings-table th {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .holdings-table th:last-child {
+    text-align: right;
+  }
+
+  .holdings-table td {
+    padding: 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .holdings-table tr:hover td {
+    background: var(--navy-light);
+  }
+
+  .holding-asset {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .holding-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--amber-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  .holding-name {
+    font-weight: 600;
+  }
+
+  .holding-symbol {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .holding-value {
+    font-weight: 600;
+    color: var(--amber);
+  }
+
+  .sell-btn {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    min-height: 36px;
+    float: right;
+  }
+
+  .sell-btn:hover {
+    border-color: var(--negative);
+    color: var(--negative);
+  }
+
+  .portfolio-empty {
+    text-align: center;
+    padding: 80px 32px;
+    color: var(--text-muted);
+  }
+
+  .portfolio-empty-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .portfolio-empty-text {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .portfolio-empty-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px 28px;
+    background: var(--amber);
+    color: var(--navy);
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+    min-height: 44px;
+  }
+
+  .portfolio-empty-btn:hover {
+    background: var(--amber-hover);
+  }
+
+  /* ── Settings Screen ── */
+  .settings-screen {
+    flex-direction: column;
+    padding: 48px 64px;
+    overflow-y: auto;
+  }
+
+  .settings-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .settings-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 48px;
+  }
+
+  .settings-group {
+    margin-bottom: 40px;
+  }
+
+  .settings-group-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row-info {
+    flex: 1;
+  }
+
+  .settings-row-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .settings-row-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .toggle {
+    width: 44px;
+    height: 24px;
+    background: var(--navy-mid);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s var(--ease);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .toggle.on {
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .toggle.on::after {
+    transform: translateX(20px);
+    background: var(--navy);
+  }
+
+  .wallet-address {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    background: var(--navy);
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Mobile Responsive ── */
+  @media (max-width: 768px) {
+    :root {
+      --nav-width: 0px;
+    }
+
+    .side-nav {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 64px;
+      flex-direction: row;
+      padding: 0 16px;
+      justify-content: space-around;
+      border-right: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-logo { display: none; }
+    .nav-items {
+      flex-direction: row;
+      gap: 0;
+      flex: 1;
+      justify-content: space-around;
+    }
+
+    .nav-item.active::before {
+      left: 50%;
+      top: -1px;
+      bottom: auto;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 3px;
+    }
+
+    .nav-bottom { display: none; }
+
+    .main-content {
+      margin-left: 0;
+      margin-bottom: 64px;
+      height: calc(100vh - 64px);
+    }
+
+    .market-screen {
+      flex-direction: column;
+    }
+
+    .hero-left {
+      width: 100%;
+      padding: 40px 24px 32px;
+    }
+
+    .hero-divider { display: none; }
+
+    .hero-stats { gap: 32px; }
+    .hero-stat-value { font-size: 22px; }
+
+    .hero-title {
+      font-size: 32px;
+    }
+
+    .market-header {
+      padding: 16px 24px 0;
+    }
+
+    .commodity-list {
+      padding: 0 24px 24px;
+    }
+
+    .commodity-card {
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .commodity-sparkline { display: none; }
+    .buy-btn { display: none; }
+
+    .trade-modal {
+      max-width: 100%;
+      margin: 16px;
+    }
+
+    .portfolio-header {
+      padding: 32px 24px 0;
+    }
+
+    .portfolio-overview {
+      grid-template-columns: 1fr;
+    }
+
+    .portfolio-holdings {
+      padding: 0 24px 24px;
+      overflow-x: auto;
+    }
+
+    .settings-screen {
+      padding: 32px 24px;
+    }
+
+    .dna-badge {
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .market-header-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .search-box {
+      width: 100%;
+      min-width: unset;
+    }
+
+    .hero-stats {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- DNA Badge -->
+<div class="dna-badge">DNA-A-S-S-D-X</div>
+
+<!-- Side Navigation -->
+<nav class="side-nav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <path d="M4 4h8v8H4V4z" fill="var(--amber)"/>
+      <path d="M16 4h8v8h-8V4z" fill="var(--amber)" opacity="0.5"/>
+      <path d="M4 16h8v8H4v-8z" fill="var(--amber)" opacity="0.3"/>
+      <path d="M16 16h8v8h-8v-8z" fill="var(--amber)" opacity="0.7"/>
+    </svg>
+  </div>
+
+  <div class="nav-items">
+    <button class="nav-item active" data-screen="market" title="Market">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </button>
+    <button class="nav-item" data-screen="portfolio" title="Portfolio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+      </svg>
+    </button>
+    <button class="nav-item" data-screen="settings" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="nav-bottom">
+    <div class="nav-avatar">TV</div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+
+  <!-- ════ Market Screen ════ -->
+  <section class="screen market-screen active" id="screen-market">
+    <div class="hero-left">
+      <span class="hero-label">BNB Chain Commodity Market</span>
+      <h1 class="hero-title">Access commodity markets.<br><span class="accent">No brokerage required.</span></h1>
+      <p class="hero-subtitle">Tokenized real-world commodities traded 24/7 on BNB Chain. Fractional ownership, instant settlement, full transparency.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-value">$24.8M</div>
+          <div class="hero-stat-label">Total Volume (24h)</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">8</div>
+          <div class="hero-stat-label">Commodities</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">2,341</div>
+          <div class="hero-stat-label">Active Traders</div>
+        </div>
+      </div>
+      <div class="hero-divider"></div>
+    </div>
+
+    <div class="market-right">
+      <div class="market-header">
+        <div class="market-header-row">
+          <h2 class="market-title">Markets</h2>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search commodities..." id="search-input">
+          </div>
+        </div>
+        <div class="category-pills">
+          <button class="pill active" data-category="all">All</button>
+          <button class="pill" data-category="precious">Precious Metals</button>
+          <button class="pill" data-category="energy">Energy</button>
+          <button class="pill" data-category="industrial">Industrial</button>
+          <button class="pill" data-category="agriculture">Agriculture</button>
+        </div>
+      </div>
+      <div class="commodity-list" id="commodity-list"></div>
+    </div>
+  </section>
+
+  <!-- ════ Portfolio Screen ════ -->
+  <section class="screen portfolio-screen" id="screen-portfolio">
+    <div class="portfolio-header">
+      <span class="portfolio-label">Your Holdings</span>
+      <h2 class="portfolio-title">Portfolio</h2>
+      <div class="portfolio-overview">
+        <div class="portfolio-stat">
+          <div class="portfolio-stat-label">Total Value</div>
+          <div class="portfolio-stat-value amber" id="portfolio-total">$0.00</div>
+          <div class="portfolio-stat-change positive" id="portfolio-change">+0.00%</div>
+        </div>
+        <div class="portfolio-stat">
+          <div class="portfolio-stat-label">Holdings</div>
+          <div class="portfolio-stat-value" id="portfolio-count">0</div>
+          <div class="portfolio-stat-change" style="color:var(--text-muted)">assets</div>
+        </div>
+        <div class="portfolio-stat">
+          <div class="portfolio-stat-label">Total P&L</div>
+          <div class="portfolio-stat-value" id="portfolio-pnl">$0.00</div>
+          <div class="portfolio-stat-change" id="portfolio-pnl-pct">+0.00%</div>
+        </div>
+      </div>
+    </div>
+    <div class="portfolio-holdings" id="portfolio-holdings"></div>
+  </section>
+
+  <!-- ════ Settings Screen ════ -->
+  <section class="screen settings-screen" id="screen-settings">
+    <span class="settings-label">Configuration</span>
+    <h2 class="settings-title">Settings</h2>
+
+    <div class="settings-group">
+      <h3 class="settings-group-title">Wallet</h3>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Connected Wallet</div>
+          <div class="settings-row-desc">BNB Chain (BSC Mainnet)</div>
+        </div>
+        <div class="wallet-address">0x7a3B...e4F2</div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Available Balance</div>
+          <div class="settings-row-desc">USDT on BNB Chain</div>
+        </div>
+        <div style="font-weight:600;font-variant-numeric:tabular-nums;color:var(--amber)">12,450.00 USDT</div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3 class="settings-group-title">Preferences</h3>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Price Alerts</div>
+          <div class="settings-row-desc">Get notified when commodities hit target prices</div>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Auto-Compound Yields</div>
+          <div class="settings-row-desc">Automatically reinvest staking rewards</div>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Slippage Tolerance</div>
+          <div class="settings-row-desc">Maximum acceptable price deviation</div>
+        </div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-secondary)">0.5%</div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <h3 class="settings-group-title">Network</h3>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Chain</div>
+          <div class="settings-row-desc">BNB Smart Chain (Chain ID: 56)</div>
+        </div>
+        <div style="font-size:13px;color:var(--positive);font-weight:500">Connected</div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-label">Gas Price</div>
+          <div class="settings-row-desc">Current network gas estimate</div>
+        </div>
+        <div style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-secondary)">3.2 Gwei</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ════ Trade Modal ════ -->
+<div class="modal-overlay" id="trade-modal">
+  <div class="trade-modal">
+    <div id="trade-form">
+      <div class="trade-modal-header">
+        <div class="trade-modal-commodity">
+          <div class="trade-modal-icon" id="modal-icon"></div>
+          <div>
+            <div class="trade-modal-name" id="modal-name"></div>
+            <div class="trade-modal-symbol" id="modal-symbol"></div>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="trade-modal-price-row">
+        <span class="trade-modal-price" id="modal-price"></span>
+        <span class="trade-modal-unit" id="modal-unit"></span>
+        <span class="trade-modal-change" id="modal-change"></span>
+      </div>
+
+      <div class="trade-modal-body">
+        <div class="trade-tabs">
+          <button class="trade-tab active" data-tab="buy">Buy</button>
+          <button class="trade-tab" data-tab="sell">Sell</button>
+        </div>
+
+        <div class="trade-input-group">
+          <label class="trade-label">Amount (USDT)</label>
+          <div class="trade-input-wrapper">
+            <span class="trade-input-prefix">$</span>
+            <input type="number" class="trade-input" id="trade-amount" placeholder="0.00" min="0" step="0.01">
+            <span class="trade-input-suffix">USDT</span>
+          </div>
+          <div class="quick-amounts">
+            <button class="quick-amount" data-amount="100">$100</button>
+            <button class="quick-amount" data-amount="500">$500</button>
+            <button class="quick-amount" data-amount="1000">$1,000</button>
+            <button class="quick-amount" data-amount="5000">$5,000</button>
+          </div>
+        </div>
+
+        <div class="trade-summary">
+          <div class="trade-summary-row">
+            <span class="trade-summary-label">Quantity</span>
+            <span class="trade-summary-value" id="trade-qty">--</span>
+          </div>
+          <div class="trade-summary-row">
+            <span class="trade-summary-label">Price per unit</span>
+            <span class="trade-summary-value" id="trade-unit-price">--</span>
+          </div>
+          <div class="trade-summary-row">
+            <span class="trade-summary-label">Network Fee</span>
+            <span class="trade-summary-value" id="trade-fee">--</span>
+          </div>
+          <div class="trade-summary-row total">
+            <span class="trade-summary-label">Total</span>
+            <span class="trade-summary-value" id="trade-total">--</span>
+          </div>
+        </div>
+
+        <button class="confirm-btn" id="confirm-trade" disabled>Enter an amount</button>
+      </div>
+    </div>
+
+    <div class="trade-success" id="trade-success">
+      <div class="success-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="success-title">Trade Confirmed</div>
+      <div class="success-detail" id="success-detail"></div>
+      <div class="success-actions">
+        <button class="success-btn primary" onclick="navigateTo('portfolio');closeModal();">View Portfolio</button>
+        <button class="success-btn secondary" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Data ──
+  const commodities = [
+    { id: 'xau', name: 'Gold', symbol: 'XAU', price: 4570, unit: '/oz', category: 'precious', change: 1.24, abbr: 'Au' },
+    { id: 'xag', name: 'Silver', symbol: 'XAG', price: 31, unit: '/oz', category: 'precious', change: -0.87, abbr: 'Ag' },
+    { id: 'xpt', name: 'Platinum', symbol: 'XPT', price: 1932, unit: '/oz', category: 'precious', change: 0.56, abbr: 'Pt' },
+    { id: 'xcu', name: 'Copper', symbol: 'XCU', price: 4.50, unit: '/lb', category: 'industrial', change: 2.13, abbr: 'Cu' },
+    { id: 'wti', name: 'Crude Oil WTI', symbol: 'WTI', price: 99, unit: '/bbl', category: 'energy', change: -1.42, abbr: 'CL' },
+    { id: 'brt', name: 'Brent Crude', symbol: 'BRT', price: 106, unit: '/bbl', category: 'energy', change: -0.93, abbr: 'CO' },
+    { id: 'ng',  name: 'Natural Gas', symbol: 'NG', price: 3.50, unit: '/MMBtu', category: 'energy', change: 3.78, abbr: 'NG' },
+    { id: 'wht', name: 'Wheat', symbol: 'WHT', price: 5.80, unit: '/bu', category: 'agriculture', change: 0.34, abbr: 'Wh' }
+  ];
+
+  let portfolio = [];
+  let currentCommodity = null;
+  let activeCategory = 'all';
+
+  // ── Sparkline SVG generator ──
+  function sparkline(change) {
+    const pts = [];
+    let v = 50;
+    for (let i = 0; i < 12; i++) {
+      v += (Math.random() - 0.5 + (change > 0 ? 0.15 : -0.15)) * 8;
+      v = Math.max(5, Math.min(95, v));
+      pts.push(`${(i / 11) * 80},${100 - v}`);
+    }
+    const color = change >= 0 ? 'var(--positive)' : 'var(--negative)';
+    return `<svg viewBox="0 0 80 100" preserveAspectRatio="none"><polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+
+  // ── Format helpers ──
+  function fmtPrice(p) {
+    if (p >= 100) return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if (p >= 1) return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return '$' + p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fmtChange(c) {
+    return (c >= 0 ? '+' : '') + c.toFixed(2) + '%';
+  }
+
+  // ── Render commodity list ──
+  function renderCommodities() {
+    const list = document.getElementById('commodity-list');
+    const search = document.getElementById('search-input').value.toLowerCase();
+
+    const filtered = commodities.filter(c => {
+      const catMatch = activeCategory === 'all' || c.category === activeCategory;
+      const searchMatch = !search || c.name.toLowerCase().includes(search) || c.symbol.toLowerCase().includes(search);
+      return catMatch && searchMatch;
+    });
+
+    list.innerHTML = filtered.map(c => `
+      <div class="commodity-card" data-id="${c.id}" onclick="openTrade('${c.id}')">
+        <div class="commodity-info">
+          <div class="commodity-icon">${c.abbr}</div>
+          <div>
+            <div class="commodity-name">${c.name}</div>
+            <div class="commodity-symbol">${c.symbol}</div>
+          </div>
+        </div>
+        <div class="commodity-sparkline">${sparkline(c.change)}</div>
+        <div class="commodity-price-col">
+          <div class="commodity-price">${fmtPrice(c.price)}</div>
+          <div class="commodity-change ${c.change >= 0 ? 'positive' : 'negative'}">${fmtChange(c.change)}</div>
+        </div>
+        <button class="buy-btn" onclick="event.stopPropagation();openTrade('${c.id}')">Buy</button>
+      </div>
+    `).join('');
+  }
+
+  // ── Navigation ──
+  window.navigateTo = function(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('screen-' + screen).classList.add('active');
+    document.querySelector(`.nav-item[data-screen="${screen}"]`).classList.add('active');
+
+    if (screen === 'portfolio') renderPortfolio();
+  };
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => navigateTo(btn.dataset.screen));
+  });
+
+  // ── Category pills ──
+  document.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeCategory = pill.dataset.category;
+      renderCommodities();
+    });
+  });
+
+  // ── Search ──
+  document.getElementById('search-input').addEventListener('input', renderCommodities);
+
+  // ── Trade Modal ──
+  window.openTrade = function(id) {
+    currentCommodity = commodities.find(c => c.id === id);
+    if (!currentCommodity) return;
+
+    const modal = document.getElementById('trade-modal');
+    document.getElementById('modal-icon').textContent = currentCommodity.abbr;
+    document.getElementById('modal-name').textContent = currentCommodity.name;
+    document.getElementById('modal-symbol').textContent = currentCommodity.symbol + ' / USDT';
+    document.getElementById('modal-price').textContent = fmtPrice(currentCommodity.price);
+    document.getElementById('modal-unit').textContent = currentCommodity.unit;
+    const changeEl = document.getElementById('modal-change');
+    changeEl.textContent = fmtChange(currentCommodity.change);
+    changeEl.className = 'trade-modal-change ' + (currentCommodity.change >= 0 ? 'positive' : 'negative');
+
+    document.getElementById('trade-amount').value = '';
+    updateTradeSummary();
+
+    document.getElementById('trade-form').style.display = 'block';
+    document.getElementById('trade-success').classList.remove('visible');
+
+    // Reset tabs
+    document.querySelectorAll('.trade-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.trade-tab[data-tab="buy"]').classList.add('active');
+
+    modal.classList.add('visible');
+    setTimeout(() => document.getElementById('trade-amount').focus(), 300);
+  };
+
+  window.closeModal = function() {
+    document.getElementById('trade-modal').classList.remove('visible');
+  };
+
+  document.getElementById('trade-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── Trade tabs ──
+  document.querySelectorAll('.trade-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.trade-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      updateTradeSummary();
+    });
+  });
+
+  // ── Quick amounts ──
+  document.querySelectorAll('.quick-amount').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('trade-amount').value = btn.dataset.amount;
+      updateTradeSummary();
+    });
+  });
+
+  // ── Trade amount input ──
+  document.getElementById('trade-amount').addEventListener('input', updateTradeSummary);
+
+  function updateTradeSummary() {
+    const amount = parseFloat(document.getElementById('trade-amount').value) || 0;
+    const btn = document.getElementById('confirm-trade');
+
+    if (!currentCommodity || amount <= 0) {
+      document.getElementById('trade-qty').textContent = '--';
+      document.getElementById('trade-unit-price').textContent = '--';
+      document.getElementById('trade-fee').textContent = '--';
+      document.getElementById('trade-total').textContent = '--';
+      btn.disabled = true;
+      btn.textContent = 'Enter an amount';
+      return;
+    }
+
+    const fee = Math.max(0.50, amount * 0.001);
+    const qty = amount / currentCommodity.price;
+
+    document.getElementById('trade-qty').textContent = qty.toFixed(qty < 1 ? 6 : 4) + ' ' + currentCommodity.symbol;
+    document.getElementById('trade-unit-price').textContent = fmtPrice(currentCommodity.price) + currentCommodity.unit;
+    document.getElementById('trade-fee').textContent = '$' + fee.toFixed(2);
+    document.getElementById('trade-total').textContent = '$' + (amount + fee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    btn.disabled = false;
+    const isBuy = document.querySelector('.trade-tab.active').dataset.tab === 'buy';
+    btn.textContent = (isBuy ? 'Buy ' : 'Sell ') + currentCommodity.symbol;
+  }
+
+  // ── Confirm trade ──
+  document.getElementById('confirm-trade').addEventListener('click', function() {
+    if (this.disabled || !currentCommodity) return;
+
+    const amount = parseFloat(document.getElementById('trade-amount').value);
+    const isBuy = document.querySelector('.trade-tab.active').dataset.tab === 'buy';
+    const qty = amount / currentCommodity.price;
+    const fee = Math.max(0.50, amount * 0.001);
+
+    if (isBuy) {
+      const existing = portfolio.find(p => p.id === currentCommodity.id);
+      if (existing) {
+        existing.qty += qty;
+        existing.cost += amount;
+      } else {
+        portfolio.push({
+          id: currentCommodity.id,
+          name: currentCommodity.name,
+          symbol: currentCommodity.symbol,
+          abbr: currentCommodity.abbr,
+          qty: qty,
+          cost: amount,
+          price: currentCommodity.price,
+          unit: currentCommodity.unit
+        });
+      }
+    } else {
+      const existing = portfolio.find(p => p.id === currentCommodity.id);
+      if (existing) {
+        existing.qty = Math.max(0, existing.qty - qty);
+        existing.cost = Math.max(0, existing.cost - amount);
+        if (existing.qty <= 0.000001) {
+          portfolio = portfolio.filter(p => p.id !== currentCommodity.id);
+        }
+      }
+    }
+
+    document.getElementById('trade-form').style.display = 'none';
+    document.getElementById('success-detail').innerHTML =
+      `You ${isBuy ? 'bought' : 'sold'} <strong>${qty.toFixed(qty < 1 ? 6 : 4)} ${currentCommodity.symbol}</strong> for <strong>$${(amount + fee).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong> (incl. $${fee.toFixed(2)} fee).`;
+    document.getElementById('trade-success').classList.add('visible');
+  });
+
+  // ── Render portfolio ──
+  function renderPortfolio() {
+    const container = document.getElementById('portfolio-holdings');
+
+    if (portfolio.length === 0) {
+      container.innerHTML = `
+        <div class="portfolio-empty">
+          <div class="portfolio-empty-title">No holdings yet</div>
+          <div class="portfolio-empty-text">Browse the market and make your first trade to see your portfolio here.</div>
+          <button class="portfolio-empty-btn" onclick="navigateTo('market')">Browse Market</button>
+        </div>`;
+      document.getElementById('portfolio-total').textContent = '$0.00';
+      document.getElementById('portfolio-count').textContent = '0';
+      document.getElementById('portfolio-pnl').textContent = '$0.00';
+      document.getElementById('portfolio-change').textContent = '+0.00%';
+      document.getElementById('portfolio-pnl-pct').textContent = '+0.00%';
+      return;
+    }
+
+    let totalValue = 0;
+    let totalCost = 0;
+
+    portfolio.forEach(h => {
+      const commodity = commodities.find(c => c.id === h.id);
+      const currentPrice = commodity ? commodity.price : h.price;
+      h.currentValue = h.qty * currentPrice;
+      totalValue += h.currentValue;
+      totalCost += h.cost;
+    });
+
+    const pnl = totalValue - totalCost;
+    const pnlPct = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+
+    document.getElementById('portfolio-total').textContent = '$' + totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('portfolio-count').textContent = portfolio.length;
+    document.getElementById('portfolio-pnl').textContent = (pnl >= 0 ? '+' : '-') + '$' + Math.abs(pnl).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('portfolio-pnl').style.color = pnl >= 0 ? 'var(--positive)' : 'var(--negative)';
+    document.getElementById('portfolio-change').textContent = fmtChange(pnlPct);
+    document.getElementById('portfolio-change').className = 'portfolio-stat-change ' + (pnlPct >= 0 ? 'positive' : 'negative');
+    document.getElementById('portfolio-pnl-pct').textContent = fmtChange(pnlPct);
+    document.getElementById('portfolio-pnl-pct').className = 'portfolio-stat-change ' + (pnlPct >= 0 ? 'positive' : 'negative');
+
+    container.innerHTML = `
+      <h3 class="portfolio-section-title">Holdings</h3>
+      <table class="holdings-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Quantity</th>
+            <th>Avg. Cost</th>
+            <th>Current Value</th>
+            <th>P&L</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${portfolio.map(h => {
+            const itemPnl = h.currentValue - h.cost;
+            const itemPnlPct = h.cost > 0 ? (itemPnl / h.cost) * 100 : 0;
+            return `<tr>
+              <td>
+                <div class="holding-asset">
+                  <div class="holding-icon">${h.abbr}</div>
+                  <div>
+                    <div class="holding-name">${h.name}</div>
+                    <div class="holding-symbol">${h.symbol}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-variant-numeric:tabular-nums">${h.qty.toFixed(h.qty < 1 ? 6 : 4)}</td>
+              <td style="font-variant-numeric:tabular-nums">$${(h.cost / h.qty).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td class="holding-value" style="font-variant-numeric:tabular-nums">$${h.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td style="font-variant-numeric:tabular-nums;color:${itemPnl >= 0 ? 'var(--positive)' : 'var(--negative)'}">${fmtChange(itemPnlPct)}</td>
+              <td><button class="sell-btn" onclick="openTrade('${h.id}')">Sell</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  // ── Keyboard shortcuts ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // ── Init ──
+  renderCommodities();
+
+})();
+</script>
+</body>
+</html>

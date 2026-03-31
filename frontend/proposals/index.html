@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraVault — Design Proposals</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090b; color: #fafafa; font-family: system-ui, sans-serif; padding: 48px 24px; }
+  h1 { font-size: 32px; margin-bottom: 8px; }
+  .subtitle { color: #71717a; margin-bottom: 48px; font-size: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto; }
+  .card { border: 1px solid #27272a; border-radius: 12px; overflow: hidden; transition: border-color 200ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .card:hover { border-color: #52525b; }
+  .card iframe { width: 100%; height: 400px; border: none; pointer-events: none; }
+  .card-body { padding: 20px; }
+  .card-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .dna { font-family: monospace; font-size: 12px; color: #a1a1aa; margin-bottom: 8px; }
+  .inspiration { font-size: 13px; color: #71717a; margin-bottom: 16px; }
+  .card a { display: inline-block; padding: 10px 20px; background: #10b981; color: #000; font-weight: 600; text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 150ms; }
+  .card a:hover { background: #34d399; }
+  .footer { text-align: center; margin-top: 64px; color: #52525b; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>TerraVault Design Proposals</h1>
+<p class="subtitle">3 proposals, 3 different directions. Pick a winner or combine elements.</p>
+
+<div class="grid">
+  <div class="card">
+    <iframe src="proposal-1.html"></iframe>
+    <div class="card-body">
+      <div class="card-title">1. Terminal</div>
+      <div class="dna">DNA-B-T-M-M-S</div>
+      <div class="inspiration">Bloomberg Terminal + Stripe — data-dense, institutional, monochrome</div>
+      <a href="proposal-1.html" target="_blank">Open Full Size</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <iframe src="proposal-2.html"></iframe>
+    <div class="card-body">
+      <div class="card-title">2. Meridian</div>
+      <div class="dna">DNA-A-S-S-D-X</div>
+      <div class="inspiration">Linear + Swiss Design — asymmetric split, navy+amber duotone, mixed serif/sans</div>
+      <a href="proposal-2.html" target="_blank">Open Full Size</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <iframe src="proposal-3.html"></iframe>
+    <div class="card-body">
+      <div class="card-title">3. Terra</div>
+      <div class="dna">DNA-G-H-I-G-E</div>
+      <div class="inspiration">Wise.com + Afrofuturism — immersive globe hero, warm gradients, serif headings</div>
+      <a href="proposal-3.html" target="_blank">Open Full Size</a>
+    </div>
+  </div>
+</div>
+
+<div class="footer">TerraVault — On-Chain Commodity Marketplace — RWA Demo Day 2026</div>
+</body>
+</html>

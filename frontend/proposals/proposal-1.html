@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraVault — On-Chain Commodity Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #09090b;
+    --bg-card: #111113;
+    --bg-card-hover: #18181b;
+    --bg-surface: #1c1c1f;
+    --bg-input: #0c0c0e;
+    --border-primary: #27272a;
+    --border-subtle: #1e1e21;
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --text-muted: #52525b;
+    --accent: #10b981;
+    --accent-dim: #064e36;
+    --accent-hover: #34d399;
+    --negative: #ef4444;
+    --negative-dim: #7f1d1d;
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* --- Tabular numbers everywhere --- */
+  .price, .stat-value, .portfolio-value, .fee-value, [data-numeric] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* --- Top Navigation --- */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 56px;
+    background: rgba(9, 9, 11, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    text-decoration: none;
+    user-select: none;
+  }
+
+  .logo-mark {
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--bg-primary);
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .nav-tab {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+  }
+
+  .nav-tab:hover {
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+  }
+
+  .nav-tab.active {
+    color: var(--text-primary);
+    background: var(--bg-surface);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dna-badge {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    padding: 4px 8px;
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    user-select: none;
+  }
+
+  .btn-connect {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-connect:hover {
+    background: var(--bg-surface);
+    border-color: var(--text-muted);
+  }
+
+  .btn-connect.connected {
+    border-color: var(--accent-dim);
+  }
+
+  .btn-connect .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* --- Stats Row --- */
+  .stats-row {
+    margin-top: 56px;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 16px 24px;
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .stat-value.accent {
+    color: var(--accent);
+  }
+
+  /* --- Main Content --- */
+  .main {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* --- Category Headers --- */
+  .category-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+
+  .category-header:first-child {
+    margin-top: 0;
+  }
+
+  /* --- Bento Grid --- */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .bento-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    cursor: pointer;
+    transition: background 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 140px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bento-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-primary);
+  }
+
+  .bento-card.large {
+    grid-column: span 2;
+    min-height: 180px;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .card-symbol {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .card-ticker {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .card-name {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .card-change {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+  }
+
+  .card-change.positive {
+    color: var(--accent);
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  .card-change.negative {
+    color: var(--negative);
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .card-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-price {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .bento-card.large .card-price {
+    font-size: 36px;
+  }
+
+  .card-unit {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+  }
+
+  /* Confidence bar */
+  .confidence-bar {
+    height: 3px;
+    background: var(--bg-surface);
+    border-radius: 2px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .confidence-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.5;
+    transition: width 0.5s var(--ease-out);
+  }
+
+  /* Sparkline (CSS-only) */
+  .sparkline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .bento-card.large .sparkline {
+    height: 60px;
+  }
+
+  /* --- Trade Panel (Slide-over) --- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s var(--ease-out), visibility 0.3s var(--ease-out);
+  }
+
+  .overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .trade-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 100vw;
+    background: var(--bg-primary);
+    border-left: 1px solid var(--border-subtle);
+    z-index: 201;
+    transform: translateX(100%);
+    transition: transform 0.4s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .trade-panel.open {
+    transform: translateX(0);
+  }
+
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .panel-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .panel-subtitle {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  .btn-close {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+    font-size: 18px;
+  }
+
+  .btn-close:hover {
+    color: var(--text-primary);
+    background: var(--bg-surface);
+  }
+
+  .panel-body {
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .panel-price-display {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .panel-live-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .panel-live-price {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .panel-live-unit {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+  }
+
+  /* Trade type tabs */
+  .trade-type-tabs {
+    display: flex;
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+  }
+
+  .trade-type-tab {
+    flex: 1;
+    min-height: 44px;
+    border: none;
+    background: none;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-radius: 3px;
+    transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+  }
+
+  .trade-type-tab.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  /* Input group */
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    transition: border-color 0.2s var(--ease-out);
+  }
+
+  .input-wrapper:focus-within {
+    border-color: var(--accent);
+  }
+
+  .input-wrapper input {
+    flex: 1;
+    min-height: 48px;
+    border: none;
+    background: none;
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+  }
+
+  .input-wrapper input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input-suffix {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    margin-left: 8px;
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 6px;
+  }
+
+  .quick-btn {
+    min-height: 44px;
+    flex: 1;
+    border: 1px solid var(--border-primary);
+    background: none;
+    color: var(--text-tertiary);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+  }
+
+  .quick-btn:hover {
+    color: var(--text-secondary);
+    border-color: var(--text-muted);
+    background: var(--bg-surface);
+  }
+
+  /* Fee breakdown */
+  .fee-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .fee-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .fee-label {
+    color: var(--text-tertiary);
+  }
+
+  .fee-value {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .fee-row.total {
+    padding-top: 10px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .fee-row.total .fee-label,
+  .fee-row.total .fee-value {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* Confirm button */
+  .btn-confirm {
+    min-height: 52px;
+    width: 100%;
+    border: none;
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s var(--ease-out), transform 0.15s var(--ease-out);
+    margin-top: auto;
+  }
+
+  .btn-confirm:hover {
+    background: var(--accent-hover);
+  }
+
+  .btn-confirm:active {
+    transform: scale(0.98);
+  }
+
+  .btn-confirm:disabled {
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .btn-confirm:disabled:active {
+    transform: none;
+  }
+
+  /* --- Portfolio View --- */
+  .portfolio-view {
+    display: none;
+  }
+
+  .portfolio-view.active {
+    display: block;
+  }
+
+  .market-view.active {
+    display: block;
+  }
+
+  .market-view {
+    display: none;
+  }
+
+  .portfolio-summary {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .portfolio-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .portfolio-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .portfolio-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Data table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-primary);
+  }
+
+  .data-table thead th:last-child {
+    text-align: right;
+  }
+
+  .data-table tbody td {
+    font-size: 14px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+
+  .data-table tbody td:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .data-table tbody td:last-child {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .data-table tbody tr {
+    transition: background 0.15s var(--ease-out);
+  }
+
+  .data-table tbody tr:hover {
+    background: var(--bg-card);
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--text-muted);
+  }
+
+  .empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-state-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-muted);
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .empty-state h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  /* --- Confirmation Toast --- */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--accent-dim);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    z-index: 300;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 380px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 0.4s var(--ease-out), opacity 0.3s var(--ease-out);
+  }
+
+  .toast.visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .toast-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--accent);
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .toast-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .toast-content p {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    line-height: 1.4;
+  }
+
+  .toast-hash {
+    font-family: 'DM Sans', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    word-break: break-all;
+  }
+
+  /* --- Skeleton loading --- */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .skel-line {
+    height: 14px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+  }
+
+  .skel-price {
+    height: 32px;
+    width: 60%;
+    border-radius: 4px;
+  }
+
+  .skel-bar {
+    height: 3px;
+    width: 100%;
+    border-radius: 2px;
+    margin-top: 12px;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 1024px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .bento-card.large {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .nav {
+      padding: 0 16px;
+    }
+    .nav-left {
+      gap: 16px;
+    }
+    .dna-badge {
+      display: none;
+    }
+    .main {
+      padding: 16px;
+    }
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+    .bento-card.large {
+      grid-column: span 1;
+    }
+    .trade-panel {
+      width: 100vw;
+    }
+    .stats-row {
+      padding: 12px 16px;
+      gap: 24px;
+    }
+    .portfolio-summary {
+      flex-wrap: wrap;
+    }
+    .card-price {
+      font-size: 24px;
+    }
+    .bento-card.large .card-price {
+      font-size: 28px;
+    }
+    .toast {
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nav-tabs {
+      display: none;
+    }
+    .mobile-tabs {
+      display: flex;
+    }
+  }
+
+  /* Mobile bottom tabs fallback */
+  .mobile-tabs {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(9, 9, 11, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 100;
+    padding: 4px 0;
+    padding-bottom: env(safe-area-inset-bottom, 4px);
+  }
+
+  .mobile-tabs .nav-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding-bottom: 60px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="#" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 14 14"><path d="M7 1L12.5 4.5V10L7 13L1.5 10V4.5L7 1Z"/></svg>
+      </div>
+      TerraVault
+    </a>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-view="market" onclick="switchView('market')">Market</button>
+      <button class="nav-tab" data-view="portfolio" onclick="switchView('portfolio')">Portfolio</button>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="dna-badge">DNA-B-T-M-M-S</span>
+    <button class="btn-connect" id="walletBtn" onclick="toggleWallet()">
+      Connect Wallet
+    </button>
+  </div>
+</nav>
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-item">
+    <span class="stat-label">Total Assets</span>
+    <span class="stat-value" data-numeric>$142,847,203</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Total Reserve</span>
+    <span class="stat-value" data-numeric>$138,412,500</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Oracle</span>
+    <span class="stat-value accent">Chainlink Live</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Network</span>
+    <span class="stat-value">BNB Chain</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Block</span>
+    <span class="stat-value" data-numeric id="blockNum">48,291,037</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-label">Gas</span>
+    <span class="stat-value" data-numeric>3.2 Gwei</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Market View -->
+  <div class="market-view active" id="marketView">
+
+    <!-- Precious Metals -->
+    <div class="category-header">Precious Metals</div>
+    <div class="bento-grid">
+      <div class="bento-card large" onclick="openTrade('XAU')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">XAU</span>
+            <span class="card-name">Gold</span>
+          </div>
+          <span class="card-change positive">+1.24%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$4,570.00 <span class="card-unit">/oz</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:94%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,45 20,42 40,38 60,40 80,35 100,30 120,28 140,32 160,25 180,20 200,18"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="bento-card" onclick="openTrade('XAG')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">XAG</span>
+            <span class="card-name">Silver</span>
+          </div>
+          <span class="card-change positive">+0.89%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$31.00 <span class="card-unit">/oz</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:91%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,35 25,32 50,36 75,30 100,28 125,33 150,27 175,25 200,22"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="bento-card" onclick="openTrade('XPT')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">XPT</span>
+            <span class="card-name">Platinum</span>
+          </div>
+          <span class="card-change negative">-0.42%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$1,932.00 <span class="card-unit">/oz</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:87%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,20 25,22 50,25 75,28 100,26 125,30 150,33 175,35 200,32"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Industrial -->
+    <div class="category-header">Industrial</div>
+    <div class="bento-grid">
+      <div class="bento-card" onclick="openTrade('XCU')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">XCU</span>
+            <span class="card-name">Copper</span>
+          </div>
+          <span class="card-change positive">+2.10%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$4.50 <span class="card-unit">/lb</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:89%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,50 25,45 50,42 75,38 100,35 125,30 150,28 175,22 200,18"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Energy -->
+    <div class="category-header">Energy</div>
+    <div class="bento-grid">
+      <div class="bento-card large" onclick="openTrade('WTI')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">WTI</span>
+            <span class="card-name">Crude Oil WTI</span>
+          </div>
+          <span class="card-change positive">+0.67%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$99.00 <span class="card-unit">/bbl</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:96%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,40 20,38 40,42 60,35 80,30 100,28 120,32 140,25 160,22 180,20 200,18"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="bento-card" onclick="openTrade('BRT')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">BRT</span>
+            <span class="card-name">Brent Crude</span>
+          </div>
+          <span class="card-change positive">+0.53%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$106.00 <span class="card-unit">/bbl</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:95%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,38 25,35 50,33 75,36 100,30 125,28 150,25 175,22 200,20"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="bento-card" onclick="openTrade('NG')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">NG</span>
+            <span class="card-name">Natural Gas</span>
+          </div>
+          <span class="card-change negative">-1.15%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$3.50 <span class="card-unit">/MMBtu</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:82%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,18 25,22 50,20 75,28 100,32 125,35 150,30 175,38 200,40"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agriculture -->
+    <div class="category-header">Agriculture</div>
+    <div class="bento-grid">
+      <div class="bento-card" onclick="openTrade('WHT')">
+        <div class="card-top">
+          <div class="card-symbol">
+            <span class="card-ticker">WHT</span>
+            <span class="card-name">Wheat</span>
+          </div>
+          <span class="card-change negative">-0.31%</span>
+        </div>
+        <div class="card-bottom">
+          <span class="card-price price">$5.80 <span class="card-unit">/bu</span></span>
+          <div class="confidence-bar"><div class="confidence-fill" style="width:78%"></div></div>
+        </div>
+        <div class="sparkline">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" width="100%" height="100%">
+            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,25 25,28 50,30 75,27 100,32 125,35 150,33 175,36 200,38"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio View -->
+  <div class="portfolio-view" id="portfolioView">
+    <div id="portfolioContent">
+      <!-- Empty state (shown when no holdings) -->
+      <div class="empty-state" id="emptyPortfolio">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>No holdings yet</h3>
+        <p>Purchase tokenized commodities from the Market tab to see them here.</p>
+      </div>
+
+      <!-- Portfolio with holdings (hidden initially) -->
+      <div id="filledPortfolio" style="display:none;">
+        <div class="portfolio-summary">
+          <div class="portfolio-stat">
+            <span class="portfolio-stat-label">Total Value</span>
+            <span class="portfolio-stat-value" id="totalValue" data-numeric>$0.00</span>
+          </div>
+          <div class="portfolio-stat">
+            <span class="portfolio-stat-label">24h Change</span>
+            <span class="portfolio-stat-value" id="totalChange" data-numeric style="color:var(--accent)">+$0.00</span>
+          </div>
+          <div class="portfolio-stat">
+            <span class="portfolio-stat-label">Holdings</span>
+            <span class="portfolio-stat-value" id="holdingCount" data-numeric>0</span>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Quantity</th>
+              <th>Avg Cost</th>
+              <th>Current Price</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody id="portfolioTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Trade Panel Overlay -->
+<div class="overlay" id="overlay" onclick="closeTrade()"></div>
+
+<!-- Trade Panel -->
+<div class="trade-panel" id="tradePanel">
+  <div class="panel-header">
+    <div class="panel-title-group">
+      <span class="panel-title" id="panelTitle">Gold</span>
+      <span class="panel-subtitle" id="panelSubtitle">XAU / USD</span>
+    </div>
+    <button class="btn-close" onclick="closeTrade()" aria-label="Close panel">&times;</button>
+  </div>
+  <div class="panel-body">
+    <div class="panel-price-display">
+      <div class="panel-live-label">Live Price</div>
+      <div class="panel-live-price price" id="panelPrice">$4,570.00</div>
+      <div class="panel-live-unit" id="panelUnit">per troy ounce</div>
+    </div>
+
+    <div class="trade-type-tabs">
+      <button class="trade-type-tab active" onclick="setTradeType(this, 'buy')">Buy</button>
+      <button class="trade-type-tab" onclick="setTradeType(this, 'sell')">Sell</button>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Amount (USD)</label>
+      <div class="input-wrapper">
+        <input type="number" id="tradeAmount" placeholder="0.00" min="0" step="0.01" oninput="updateFees()">
+        <span class="input-suffix">USD</span>
+      </div>
+      <div class="quick-amounts">
+        <button class="quick-btn" onclick="setAmount(100)">$100</button>
+        <button class="quick-btn" onclick="setAmount(500)">$500</button>
+        <button class="quick-btn" onclick="setAmount(1000)">$1K</button>
+        <button class="quick-btn" onclick="setAmount(5000)">$5K</button>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">You Receive</label>
+      <div class="input-wrapper">
+        <input type="text" id="receiveAmount" readonly placeholder="0.0000" tabindex="-1">
+        <span class="input-suffix" id="receiveSuffix">XAU</span>
+      </div>
+    </div>
+
+    <div class="fee-breakdown">
+      <div class="fee-row">
+        <span class="fee-label">Network Fee</span>
+        <span class="fee-value" id="networkFee" data-numeric>$0.00</span>
+      </div>
+      <div class="fee-row">
+        <span class="fee-label">Platform Fee (0.1%)</span>
+        <span class="fee-value" id="platformFee" data-numeric>$0.00</span>
+      </div>
+      <div class="fee-row">
+        <span class="fee-label">Slippage Tolerance</span>
+        <span class="fee-value">0.5%</span>
+      </div>
+      <div class="fee-row total">
+        <span class="fee-label">Total Cost</span>
+        <span class="fee-value" id="totalCost" data-numeric>$0.00</span>
+      </div>
+    </div>
+
+    <button class="btn-confirm" id="confirmBtn" disabled onclick="confirmTrade()">Enter an amount</button>
+  </div>
+</div>
+
+<!-- Confirmation Toast -->
+<div class="toast" id="toast">
+  <div class="toast-icon">
+    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="toast-content">
+    <h4>Transaction Confirmed</h4>
+    <p id="toastMessage">Purchased 0.0219 XAU for $100.00</p>
+    <div class="toast-hash" id="toastHash">0x7a3f...e91b</div>
+  </div>
+</div>
+
+<!-- Mobile Bottom Tabs -->
+<div class="mobile-tabs">
+  <button class="nav-tab active" data-view="market" onclick="switchView('market')">Market</button>
+  <button class="nav-tab" data-view="portfolio" onclick="switchView('portfolio')">Portfolio</button>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ---- Commodity Data ----
+  const commodities = {
+    XAU: { name: 'Gold', price: 4570.00, unit: '/oz', unitFull: 'per troy ounce', change: 1.24 },
+    XAG: { name: 'Silver', price: 31.00, unit: '/oz', unitFull: 'per troy ounce', change: 0.89 },
+    XPT: { name: 'Platinum', price: 1932.00, unit: '/oz', unitFull: 'per troy ounce', change: -0.42 },
+    XCU: { name: 'Copper', price: 4.50, unit: '/lb', unitFull: 'per pound', change: 2.10 },
+    WTI: { name: 'Crude Oil WTI', price: 99.00, unit: '/bbl', unitFull: 'per barrel', change: 0.67 },
+    BRT: { name: 'Brent Crude', price: 106.00, unit: '/bbl', unitFull: 'per barrel', change: 0.53 },
+    NG:  { name: 'Natural Gas', price: 3.50, unit: '/MMBtu', unitFull: 'per MMBtu', change: -1.15 },
+    WHT: { name: 'Wheat', price: 5.80, unit: '/bu', unitFull: 'per bushel', change: -0.31 }
+  };
+
+  let currentTicker = null;
+  let tradeType = 'buy';
+  let walletConnected = false;
+  const portfolio = [];
+  const NETWORK_FEE = 0.12;
+
+  // ---- View Switching ----
+  window.switchView = function(view) {
+    const marketView = document.getElementById('marketView');
+    const portfolioView = document.getElementById('portfolioView');
+
+    marketView.classList.toggle('active', view === 'market');
+    portfolioView.classList.toggle('active', view === 'portfolio');
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.view === view);
+    });
+
+    if (view === 'portfolio') renderPortfolio();
+  };
+
+  // ---- Wallet Connect ----
+  window.toggleWallet = function() {
+    const btn = document.getElementById('walletBtn');
+    if (walletConnected) {
+      walletConnected = false;
+      btn.innerHTML = 'Connect Wallet';
+      btn.classList.remove('connected');
+    } else {
+      walletConnected = true;
+      btn.innerHTML = '<span class="dot"></span>0x7a3f...e91b';
+      btn.classList.add('connected');
+    }
+  };
+
+  // ---- Trade Panel ----
+  window.openTrade = function(ticker) {
+    currentTicker = ticker;
+    const c = commodities[ticker];
+
+    document.getElementById('panelTitle').textContent = c.name;
+    document.getElementById('panelSubtitle').textContent = ticker + ' / USD';
+    document.getElementById('panelPrice').textContent = formatPrice(c.price);
+    document.getElementById('panelUnit').textContent = c.unitFull;
+    document.getElementById('receiveSuffix').textContent = ticker;
+    document.getElementById('tradeAmount').value = '';
+    document.getElementById('receiveAmount').value = '';
+    updateFees();
+
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('tradePanel').classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(function() {
+      document.getElementById('tradeAmount').focus();
+    }, 400);
+  };
+
+  window.closeTrade = function() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('tradePanel').classList.remove('open');
+    document.body.style.overflow = '';
+    currentTicker = null;
+  };
+
+  window.setTradeType = function(el, type) {
+    tradeType = type;
+    el.parentElement.querySelectorAll('.trade-type-tab').forEach(function(t) {
+      t.classList.remove('active');
+    });
+    el.classList.add('active');
+    updateFees();
+  };
+
+  window.setAmount = function(val) {
+    document.getElementById('tradeAmount').value = val;
+    updateFees();
+  };
+
+  window.updateFees = function() {
+    const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+    const c = currentTicker ? commodities[currentTicker] : null;
+
+    if (!c || amount <= 0) {
+      document.getElementById('receiveAmount').value = '';
+      document.getElementById('networkFee').textContent = '$0.00';
+      document.getElementById('platformFee').textContent = '$0.00';
+      document.getElementById('totalCost').textContent = '$0.00';
+      document.getElementById('confirmBtn').textContent = 'Enter an amount';
+      document.getElementById('confirmBtn').disabled = true;
+      return;
+    }
+
+    const platformFee = amount * 0.001;
+    const totalCost = amount + platformFee + NETWORK_FEE;
+    const qty = amount / c.price;
+
+    document.getElementById('receiveAmount').value = qty.toFixed(qty < 1 ? 6 : 4);
+    document.getElementById('networkFee').textContent = '$' + NETWORK_FEE.toFixed(2);
+    document.getElementById('platformFee').textContent = '$' + platformFee.toFixed(2);
+    document.getElementById('totalCost').textContent = '$' + totalCost.toFixed(2);
+    document.getElementById('confirmBtn').textContent = (tradeType === 'buy' ? 'Buy ' : 'Sell ') + currentTicker;
+    document.getElementById('confirmBtn').disabled = false;
+  };
+
+  // ---- Confirm Trade ----
+  window.confirmTrade = function() {
+    if (!currentTicker) return;
+    const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+    if (amount <= 0) return;
+
+    const c = commodities[currentTicker];
+    const qty = amount / c.price;
+
+    // Add to portfolio
+    const existing = portfolio.find(function(p) { return p.ticker === currentTicker; });
+    if (existing) {
+      const totalQty = existing.qty + qty;
+      existing.avgCost = ((existing.avgCost * existing.qty) + amount) / totalQty;
+      existing.qty = totalQty;
+    } else {
+      portfolio.push({
+        ticker: currentTicker,
+        name: c.name,
+        qty: qty,
+        avgCost: c.price
+      });
+    }
+
+    // Generate mock attestation hash
+    const hash = '0x' + Array.from({length: 64}, function() {
+      return '0123456789abcdef'[Math.floor(Math.random() * 16)];
+    }).join('');
+
+    // Show toast
+    document.getElementById('toastMessage').textContent =
+      'Purchased ' + qty.toFixed(qty < 1 ? 6 : 4) + ' ' + currentTicker + ' for $' + amount.toFixed(2);
+    document.getElementById('toastHash').textContent = hash.slice(0, 6) + '...' + hash.slice(-4);
+
+    closeTrade();
+
+    setTimeout(function() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('visible');
+      setTimeout(function() {
+        toast.classList.remove('visible');
+      }, 4000);
+    }, 500);
+  };
+
+  // ---- Portfolio Rendering ----
+  function renderPortfolio() {
+    const empty = document.getElementById('emptyPortfolio');
+    const filled = document.getElementById('filledPortfolio');
+    const tbody = document.getElementById('portfolioTableBody');
+
+    if (portfolio.length === 0) {
+      empty.style.display = '';
+      filled.style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+    filled.style.display = '';
+
+    let totalValue = 0;
+    let totalChangeAmt = 0;
+    tbody.innerHTML = '';
+
+    portfolio.forEach(function(h) {
+      const c = commodities[h.ticker];
+      const value = h.qty * c.price;
+      const costBasis = h.qty * h.avgCost;
+      const pnl = value - costBasis;
+      totalValue += value;
+      totalChangeAmt += pnl;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + h.name + ' (' + h.ticker + ')</td>' +
+        '<td data-numeric>' + h.qty.toFixed(h.qty < 1 ? 6 : 4) + '</td>' +
+        '<td data-numeric>' + formatPrice(h.avgCost) + '</td>' +
+        '<td data-numeric>' + formatPrice(c.price) + '</td>' +
+        '<td data-numeric style="color:' + (pnl >= 0 ? 'var(--accent)' : 'var(--negative)') + '">' + formatPrice(value) + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('totalValue').textContent = formatPrice(totalValue);
+    document.getElementById('totalChange').textContent =
+      (totalChangeAmt >= 0 ? '+' : '-') + '$' + Math.abs(totalChangeAmt).toFixed(2);
+    document.getElementById('totalChange').style.color =
+      totalChangeAmt >= 0 ? 'var(--accent)' : 'var(--negative)';
+    document.getElementById('holdingCount').textContent = portfolio.length;
+  }
+
+  // ---- Helpers ----
+  function formatPrice(n) {
+    if (n >= 1000) return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (n >= 1) return '$' + n.toFixed(2);
+    return '$' + n.toFixed(4);
+  }
+
+  // ---- Simulated price ticks ----
+  function tickPrices() {
+    Object.keys(commodities).forEach(function(ticker) {
+      const c = commodities[ticker];
+      const delta = (Math.random() - 0.48) * c.price * 0.0003;
+      c.price = Math.max(0.01, c.price + delta);
+    });
+
+    // Update visible card prices
+    document.querySelectorAll('.bento-card').forEach(function(card) {
+      const ticker = card.getAttribute('onclick');
+      if (!ticker) return;
+      const match = ticker.match(/'(\w+)'/);
+      if (!match) return;
+      const t = match[1];
+      const c = commodities[t];
+      if (!c) return;
+      const priceEl = card.querySelector('.card-price');
+      if (priceEl) {
+        priceEl.innerHTML = formatPrice(c.price) + ' <span class="card-unit">' + c.unit + '</span>';
+      }
+    });
+
+    // Update panel price if open
+    if (currentTicker) {
+      document.getElementById('panelPrice').textContent = formatPrice(commodities[currentTicker].price);
+      updateFees();
+    }
+
+    // Tick block number
+    var blockEl = document.getElementById('blockNum');
+    var blockStr = blockEl.textContent.replace(/,/g, '');
+    var block = parseInt(blockStr, 10) + Math.floor(Math.random() * 3);
+    blockEl.textContent = block.toLocaleString('en-US');
+  }
+
+  setInterval(tickPrices, 2000);
+
+  // ---- Loading skeleton demo ----
+  // Brief skeleton flash on initial load
+  var cards = document.querySelectorAll('.bento-card');
+  cards.forEach(function(card) {
+    var original = card.innerHTML;
+    card.innerHTML =
+      '<div class="skel-line skeleton" style="width:40%"></div>' +
+      '<div style="margin-top:auto">' +
+        '<div class="skel-price skeleton"></div>' +
+        '<div class="skel-bar skeleton"></div>' +
+      '</div>';
+    setTimeout(function() {
+      card.innerHTML = original;
+    }, 800 + Math.random() * 400);
+  });
+
+  // ---- Keyboard shortcut: Escape closes panel ----
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeTrade();
+  });
+})();
+</script>
+</body>
+</html>
